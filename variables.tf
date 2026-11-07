@@ -1,3 +1,9 @@
+variable "project_name" {
+  description = "Prefix used to name infrastructure resources."
+  type        = string
+  default     = "dev"
+}
+
 variable "aws_region" {
   description = "AWS region to deploy the infrastructure"
   type        = string

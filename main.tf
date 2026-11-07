@@ -8,7 +8,7 @@ terraform {
 }
 
 provider "aws" {
-  region                      = "us-east-1"
+  region                      = var.aws_region
   access_key                  = "test"
   secret_key                  = "test"
   skip_credentials_validation = true
@@ -21,12 +21,12 @@ provider "aws" {
 }
 
 resource "aws_vpc" "main" {
-  cidr_block           = "10.0.0.0/16"
+  cidr_block           = var.vpc_cidr
   enable_dns_hostnames = true
   enable_dns_support   = true
 
   tags = {
-    Name = "dev-vpc"
+    Name = "${var.project_name}-vpc"
   }
 }
 
@@ -34,49 +34,49 @@ resource "aws_internet_gateway" "main" {
   vpc_id = aws_vpc.main.id
 
   tags = {
-    Name = "dev-igw"
+    Name = "${var.project_name}-igw"
   }
 }
 
 resource "aws_subnet" "public_1" {
   vpc_id                  = aws_vpc.main.id
-  cidr_block              = "10.0.1.0/24"
-  availability_zone       = "us-east-1a"
+  cidr_block              = var.public_subnet_1_cidr
+  availability_zone       = var.availability_zone_1
   map_public_ip_on_launch = true
 
   tags = {
-    Name = "dev-public-1"
+    Name = "${var.project_name}-public-1"
   }
 }
 
 resource "aws_subnet" "public_2" {
   vpc_id                  = aws_vpc.main.id
-  cidr_block              = "10.0.2.0/24"
-  availability_zone       = "us-east-1b"
+  cidr_block              = var.public_subnet_2_cidr
+  availability_zone       = var.availability_zone_2
   map_public_ip_on_launch = true
 
   tags = {
-    Name = "dev-public-2"
+    Name = "${var.project_name}-public-2"
   }
 }
 
 resource "aws_subnet" "private_1" {
   vpc_id            = aws_vpc.main.id
-  cidr_block        = "10.0.3.0/24"
-  availability_zone = "us-east-1a"
+  cidr_block        = var.private_subnet_1_cidr
+  availability_zone = var.availability_zone_1
 
   tags = {
-    Name = "dev-private-1"
+    Name = "${var.project_name}-private-1"
   }
 }
 
 resource "aws_subnet" "private_2" {
   vpc_id            = aws_vpc.main.id
-  cidr_block        = "10.0.4.0/24"
-  availability_zone = "us-east-1b"
+  cidr_block        = var.private_subnet_2_cidr
+  availability_zone = var.availability_zone_2
 
   tags = {
-    Name = "dev-private-2"
+    Name = "${var.project_name}-private-2"
   }
 }
 
@@ -89,7 +89,7 @@ resource "aws_route_table" "public" {
   }
 
   tags = {
-    Name = "dev-public-rt"
+    Name = "${var.project_name}-public-rt"
   }
 }
 
@@ -107,7 +107,7 @@ resource "aws_route_table" "private" {
   vpc_id = aws_vpc.main.id
 
   tags = {
-    Name = "dev-private-rt"
+    Name = "${var.project_name}-private-rt"
   }
 }
 
@@ -122,7 +122,7 @@ resource "aws_route_table_association" "private_2" {
 }
 
 resource "aws_security_group" "alb" {
-  name_prefix = "dev-alb-"
+  name_prefix = "${var.project_name}-alb-"
   vpc_id      = aws_vpc.main.id
 
   ingress {
@@ -147,7 +147,7 @@ resource "aws_security_group" "alb" {
   }
 
   tags = {
-    Name = "dev-alb-sg"
+    Name = "${var.project_name}-alb-sg"
   }
 
   lifecycle {
@@ -156,7 +156,7 @@ resource "aws_security_group" "alb" {
 }
 
 resource "aws_security_group" "app" {
-  name_prefix = "dev-app-"
+  name_prefix = "${var.project_name}-app-"
   vpc_id      = aws_vpc.main.id
 
   ingress {
@@ -174,7 +174,7 @@ resource "aws_security_group" "app" {
   }
 
   tags = {
-    Name = "dev-app-sg"
+    Name = "${var.project_name}-app-sg"
   }
 
   lifecycle {
@@ -183,7 +183,7 @@ resource "aws_security_group" "app" {
 }
 
 resource "aws_security_group" "db" {
-  name_prefix = "dev-db-"
+  name_prefix = "${var.project_name}-db-"
   vpc_id      = aws_vpc.main.id
 
   ingress {
@@ -201,7 +201,7 @@ resource "aws_security_group" "db" {
   }
 
   tags = {
-    Name = "dev-db-sg"
+    Name = "${var.project_name}-db-sg"
   }
 
   lifecycle {
