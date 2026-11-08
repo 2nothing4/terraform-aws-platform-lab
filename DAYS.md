@@ -23,7 +23,7 @@
 
 ## Day 04 — LocalStack Apply & Verification
 - **Objective:** Prove the infrastructure can actually be created, not just planned.
-- **Changes:** Pending.
-- **Validation:** Pending.
-- **Evidence:** Pending.
-- **Outcome:** Pending.
+- **Changes:** None (infrastructure code unchanged). Executed `terraform apply` against a fresh LocalStack container.
+- **Validation:** `terraform apply -var-file="terraform.tfvars.example"` succeeded. LocalStack API logs confirmed 200 OK for all resource creations.
+- **Evidence:** `Apply complete! Resources: 21 added, 0 changed, 0 destroyed.` Outputs exported (VPC ID, Subnet IDs).
+- **Outcome:** The Terraform configuration is fully validated at runtime. The isolated network and least-privilege security rules successfully deployed.
