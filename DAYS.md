@@ -27,3 +27,16 @@
 - **Validation:** `terraform apply -var-file="terraform.tfvars.example"` succeeded. LocalStack API logs confirmed 200 OK for all resource creations.
 - **Evidence:** `Apply complete! Resources: 21 added, 0 changed, 0 destroyed.` Outputs exported (VPC ID, Subnet IDs).
 - **Outcome:** The Terraform configuration is fully validated at runtime. The isolated network and least-privilege security rules successfully deployed.
+
+## Day 05 — Terraform CI Pipeline
+- **Objective:** Automate formatting, validation, and linting checks in GitHub Actions.
+- **Changes:** Created `.github/workflows/terraform-ci.yml` and `.tflint.hcl`. Added `required_version = ">= 1.0.0"` to `main.tf` to satisfy TFLint rules.
+- **Validation:** GitHub Actions workflow `Terraform CI #2` passed successfully (Format, Init, Validate, TFLint).
+- **Evidence:** GitHub Actions green checkmark.
+- **Outcome:** The repository now enforces code quality and Terraform best practices on every push to `main`.
+
+## Day 06 — Repository Hardening
+- **Objective:** Prevent broken infrastructure code from being merged.
+- **Changes:** Enabled GitHub branch protection rules for `main`. Required the `Terraform CI` status check to pass before merging.
+- **Validation:** Verified the rule is active in repository settings.
+- **Outcome:** The CI pipeline now actively blocks merges if formatting, validation, or TFLint fails.
