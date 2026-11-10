@@ -1,6 +1,5 @@
 terraform {
-  required_version = ">= 1.0.0" # <--- ADD THIS LINE
-
+  required_version = ">= 1.0.0"
   required_providers {
     aws = {
       source  = "hashicorp/aws"
@@ -21,6 +20,10 @@ provider "aws" {
     ec2 = "http://localhost:4566"
   }
 }
+
+# ---------------------------------------------------------
+# NETWORK FOUNDATION
+# ---------------------------------------------------------
 
 resource "aws_vpc" "main" {
   cidr_block           = var.vpc_cidr
@@ -46,9 +49,7 @@ resource "aws_subnet" "public_1" {
   availability_zone       = var.availability_zone_1
   map_public_ip_on_launch = true
 
-  tags = {
-    Name = "${var.project_name}-public-1"
-  }
+  tags = { Name = "${var.project_name}-public-1" }
 }
 
 resource "aws_subnet" "public_2" {
@@ -57,9 +58,7 @@ resource "aws_subnet" "public_2" {
   availability_zone       = var.availability_zone_2
   map_public_ip_on_launch = true
 
-  tags = {
-    Name = "${var.project_name}-public-2"
-  }
+  tags = { Name = "${var.project_name}-public-2" }
 }
 
 resource "aws_subnet" "private_1" {
@@ -67,9 +66,7 @@ resource "aws_subnet" "private_1" {
   cidr_block        = var.private_subnet_1_cidr
   availability_zone = var.availability_zone_1
 
-  tags = {
-    Name = "${var.project_name}-private-1"
-  }
+  tags = { Name = "${var.project_name}-private-1" }
 }
 
 resource "aws_subnet" "private_2" {
@@ -77,9 +74,7 @@ resource "aws_subnet" "private_2" {
   cidr_block        = var.private_subnet_2_cidr
   availability_zone = var.availability_zone_2
 
-  tags = {
-    Name = "${var.project_name}-private-2"
-  }
+  tags = { Name = "${var.project_name}-private-2" }
 }
 
 resource "aws_route_table" "public" {
@@ -90,9 +85,7 @@ resource "aws_route_table" "public" {
     gateway_id = aws_internet_gateway.main.id
   }
 
-  tags = {
-    Name = "${var.project_name}-public-rt"
-  }
+  tags = { Name = "${var.project_name}-public-rt" }
 }
 
 resource "aws_route_table_association" "public_1" {
@@ -108,9 +101,7 @@ resource "aws_route_table_association" "public_2" {
 resource "aws_route_table" "private" {
   vpc_id = aws_vpc.main.id
 
-  tags = {
-    Name = "${var.project_name}-private-rt"
-  }
+  tags = { Name = "${var.project_name}-private-rt" }
 }
 
 resource "aws_route_table_association" "private_1" {
@@ -123,40 +114,15 @@ resource "aws_route_table_association" "private_2" {
   route_table_id = aws_route_table.private.id
 }
 
-resource "aws_cloudwatch_log_group" "vpc_flow_logs" {
-  name              = "${var.project_name}-vpc-flow-logs"
-  retention_in_days = 7
-}
-
-resource "aws_iam_role" "vpc_flow_log_role" {
-  name = "${var.project_name}-vpc-flow-log-role"
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [{
-      Action    = "sts:AssumeRole"
-      Effect    = "Allow"
-      Principal = { Service = "vpc-flow-logs.amazonaws.com" }
-    }]
-  })
-}
-
-resource "aws_vpc" "main" {
-  # ... (add this line inside your existing VPC resource)
-  enable_flow_log = true # Wait, actually flow logs are created separately, just add the aws_flow_log resource below.
-}
-
-resource "aws_flow_log" "main" {
-  iam_role_arn    = aws_iam_role.vpc_flow_log_role.arn
-  log_destination = aws_cloudwatch_log_group.vpc_flow_logs.arn
-  traffic_type    = "ALL"
-  vpc_id          = aws_vpc.main.id
-}
+# ---------------------------------------------------------
+# SECURITY & LOGGING (Added for Checkov)
+# ---------------------------------------------------------
 
 resource "aws_default_security_group" "default" {
   vpc_id = aws_vpc.main.id
   # Empty means no inbound or outbound rules (fully locked down)
 }
-# VPC Flow Logs
+
 resource "aws_cloudwatch_log_group" "vpc_flow_logs" {
   name              = "${var.project_name}-vpc-flow-logs"
   retention_in_days = 7
@@ -179,10 +145,4 @@ resource "aws_flow_log" "main" {
   log_destination = aws_cloudwatch_log_group.vpc_flow_logs.arn
   traffic_type    = "ALL"
   vpc_id          = aws_vpc.main.id
-}
-
-# Restrict Default Security Group
-resource "aws_default_security_group" "default" {
-  vpc_id = aws_vpc.main.id
-  # Empty means no rules (fully restricted)
 }
