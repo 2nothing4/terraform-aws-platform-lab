@@ -11,7 +11,7 @@
   <img src="https://img.shields.io/badge/Status-Early_Development-orange" alt="Project Status" />
 </p>
 
-*An independent infrastructure engineering project by [Ziad](https://github.com/2nothing4).*
+*An independent infrastructure engineering project by [Ziad](https://github.com/ziadchabane).*
 
 </div>
 
@@ -216,7 +216,7 @@ You should also have a basic understanding of Terraform configuration, AWS netwo
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/2nothing4/terraform-aws-platform-lab.git
+git clone https://github.com/ziadchabane/terraform-aws-platform-lab.git
 cd terraform-aws-platform-lab
 ```
 
